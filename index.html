@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPF Quiz Game</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right,#4facfe,#00f2fe);
+    margin:0;
+    padding:20px;
+    text-align:center;
+}
+
+h1{
+    color:white;
+    font-size:42px;
+}
+
+.subtitle{
+    color:white;
+    margin-bottom:20px;
+}
+
+.top-bar{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+}
+
+.box{
+    background:white;
+    padding:15px 25px;
+    border-radius:15px;
+    font-size:28px;
+    font-weight:bold;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.quiz-container{
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    max-width:1200px;
+    margin:auto;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+}
+
+.food-name{
+    font-size:22px;
+    font-weight:bold;
+    margin:15px 0;
+}
+
+.buttons{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    padding-bottom:20px;
+}
+
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    color:white;
+}
+
+.real{
+    background:#4CAF50;
+}
+
+.upf{
+    background:#FF5722;
+}
+
+button:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
+}
+
+.end{
+    margin-top:30px;
+    font-size:40px;
+    color:white;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🍔 UPF QUIZ GAME</h1>
+<p class="subtitle">
+เลือกว่าอาหารแต่ละชนิดเป็น Real Food หรือ Ultra-Processed Food
+</p>
+
+<div class="top-bar">
+
+    <div class="box">
+        ⏳ <span id="timer">30</span> วินาที
+    </div>
+
+    <div class="box">
+        🎯 คะแนน: <span id="score">0</span>
+    </div>
+
+</div>
+
+<div class="quiz-container" id="quizContainer"></div>
+
+<div class="end" id="endMessage"></div>
+
+<script>
+
+const foods = [
+
+{
+    name:"🍌 กล้วย",
+    image:"https://images.unsplash.com/photo-1574226516831-e1dff420e37f",
+    answer:"real"
+},
+
+{
+    name:"🍟 มันฝรั่งทอด",
+    image:"https://images.unsplash.com/photo-1630384060421-cb20d0e0649d",
+    answer:"upf"
+},
+
+{
+    name:"🥚 ไข่ต้ม",
+    image:"https://images.unsplash.com/photo-1518569656558-1f25e69d93d7",
+    answer:"real"
+},
+
+{
+    name:"🥤 น้ำอัดลม",
+    image:"https://images.unsplash.com/photo-1622483767028-3f66f32aef97",
+    answer:"upf"
+},
+
+{
+    name:"🍎 แอปเปิล",
+    image:"https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6",
+    answer:"real"
+},
+
+{
+    name:"🍜 บะหมี่กึ่งสำเร็จรูป",
+    image:"https://images.unsplash.com/photo-1612929633738-8fe44f7ec841",
+    answer:"upf"
+},
+
+{
+    name:"🥦 ผักสด",
+    image:"https://images.unsplash.com/photo-1540420773420-3366772f4999",
+    answer:"real"
+},
+
+{
+    name:"🍩 โดนัท",
+    image:"https://images.unsplash.com/photo-1509440159596-0249088772ff",
+    answer:"upf"
+},
+
+{
+    name:"🍗 ไก่ย่าง",
+    image:"https://images.unsplash.com/photo-1527477396000-e27163b481c2",
+    answer:"real"
+},
+
+{
+    name:"🧋 ชานมไข่มุก",
+    image:"https://images.unsplash.com/photo-1558857563-b371033873b8",
+    answer:"upf"
+}
+
+];
+
+let score = 0;
+
+const quizContainer = document.getElementById("quizContainer");
+
+foods.forEach((food,index)=>{
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+
+        <img src="${food.image}">
+
+        <div class="food-name">${food.name}</div>
+
+        <div class="buttons">
+
+            <button class="real"
+            onclick="checkAnswer(${index},'real',this)">
+            🥦 Real Food
+            </button>
+
+            <button class="upf"
+            onclick="checkAnswer(${index},'upf',this)">
+            🍟 UPF
+            </button>
+
+        </div>
+
+    `;
+
+    quizContainer.appendChild(card);
+
+});
+
+function checkAnswer(index,choice,button){
+
+    const food = foods[index];
+
+    // ไม่เฉลย
+    if(choice === food.answer){
+        score++;
+    }
+
+    document.getElementById("score").innerHTML = score;
+
+    const parent = button.parentElement;
+
+    Array.from(parent.children).forEach(btn=>{
+        btn.disabled = true;
+    });
+
+}
+
+let timeLeft = 30;
+
+const timer = setInterval(()=>{
+
+    timeLeft--;
+
+    document.getElementById("timer").innerHTML = timeLeft;
+
+    if(timeLeft <= 0){
+
+        clearInterval(timer);
+
+        document.querySelectorAll("button").forEach(btn=>{
+            btn.disabled = true;
+        });
+
+        document.getElementById("endMessage").innerHTML =
+        "⏰ หมดเวลา! คะแนนของคุณ = " + score + "/10";
+
+    }
+
+},1000);
+
+</script>
+
+</body>
+</html>
